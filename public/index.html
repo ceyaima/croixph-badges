@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>croixph's badges</title><link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header-container">
+        <h1>croixph's badges</h1>
+        <input type="text" id="searchBar" onkeyup="filterSeries()" placeholder="Search series...">
+        <h2 style="font-size:1em;">Category names are based on the AniList ENGLISH title.<br>Exceptions include collection series (e.g. Fate, Monogatari) and anything not on AniList.<br>In that case, follow your heart.</h2>
+    </div>
+    <div class="grid" id="seriesGrid">
+        <a href="86.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx116589-qT34qzsZtk9V.jpg" alt="86 EIGHTY-SIX" loading="lazy">
+            <div class="title">86 EIGHTY-SIX</div>
+        </a>
+        <a href="a sign of affection.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx166794-1MAXFMgND6qS.jpg" alt="A Sign of Affection" loading="lazy">
+            <div class="title">A Sign of Affection</div>
+        </a>
+        <a href="AKIRA.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx126016-9PaIQHxFyyho.png" alt="AKIRA (Shin Anime)" loading="lazy">
+            <div class="title">AKIRA (Shin Anime)</div>
+        </a>
+        <a href="alya sometimes hides her feelings in russian.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx162804-TBeptcAfvqTd.jpg" alt="Alya Sometimes Hides Her Feelings in Russian" loading="lazy">
+            <div class="title">Alya Sometimes Hides Her Feelings in Russian</div>
+        </a>
+        <a href="attack on titan.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx16498-buvcRTBx4NSm.jpg" alt="Attack on Titan" loading="lazy">
+            <div class="title">Attack on Titan</div>
+        </a>
+        <a href="birdie wing.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx140830-hHqRY63VwOp2.jpg" alt="BIRDIE WING -Golf Girls' Story-" loading="lazy">
+            <div class="title">BIRDIE WING -Golf Girls' Story-</div>
+        </a>
+        <a href="bleach.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx269-d2GmRkJbMopq.png" alt="Bleach" loading="lazy">
+            <div class="title">Bleach</div>
+        </a>
+        <a href="blue lock.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx137822-U8naszP96vzC.png" alt="BLUE LOCK" loading="lazy">
+            <div class="title">BLUE LOCK</div>
+        </a>
+        <a href="bungou stray dogs.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21311-hAXyT8Yoh6G9.jpg" alt="Bungo Stray Dogs" loading="lazy">
+            <div class="title">Bungo Stray Dogs</div>
+        </a>
+        <a href="dandadan.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx171018-60q1B6GK2Ghb.jpg" alt="DAN DA DAN" loading="lazy">
+            <div class="title">DAN DA DAN</div>
+        </a>
+        <a href="delicious in dungeon.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx153518-IVXPDY5ph3kO.jpg" alt="Delicious in Dungeon" loading="lazy">
+            <div class="title">Delicious in Dungeon</div>
+        </a>
+        <a href="demon slayer.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101922-WBsBl0ClmgYL.jpg" alt="Demon Slayer" loading="lazy">
+            <div class="title">Demon Slayer</div>
+        </a>
+        <a href="dr stone.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx105333-GybuoSoOZfpH.jpg" alt="Dr. STONE" loading="lazy">
+            <div class="title">Dr. STONE</div>
+        </a>
+        <a href="fate.html" class="card">
+            <img src="https://m.media-amazon.com/images/M/MV5BZTNmZWI3ZWYtNjkzYi00ZTFkLWI0MzctMjc2YzlmNGRkNzRiXkEyXkFqcGc@._V1_.jpg" alt="Fate Series" loading="lazy">
+            <div class="title">Fate Series</div>
+        </a>
+        <a href="FLCL.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx227-qOB9ZhVvNnqO.jpg" alt="FLCL" loading="lazy">
+            <div class="title">FLCL</div>
+        </a>
+        <a href="given.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx108430-UdruJPro4vDK.jpg" alt="given" loading="lazy">
+            <div class="title">given</div>
+        </a>
+        <a href="haikyuu.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20464-ooZUyBe4ptp9.png" alt="HAIKYU!!" loading="lazy">
+            <div class="title">HAIKYU!!</div>
+        </a>
+        <a href="hell's paradise.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx128893-Gc2t8b8M0mVu.jpg" alt="Hell’s Paradise" loading="lazy">
+            <div class="title">Hell’s Paradise</div>
+        </a>
+        <a href="horimiya.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx124080-oeviACzGv5Vx.jpg" alt="Horimiya" loading="lazy">
+            <div class="title">Horimiya</div>
+        </a>
+        <a href="how to win my husband over.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx141013-YZhKrs2IqxWY.png" alt="How to Win My Husband Over" loading="lazy">
+            <div class="title">How to Win My Husband Over</div>
+        </a>
+        <a href="hunter x hunter.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11061-y5gsT1hoHuHw.png" alt="Hunter X Hunter" loading="lazy">
+            <div class="title">Hunter X Hunter</div>
+        </a>
+        <a href="i want to eat your pancreas.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx99750-pNyly9d3MEgV.jpg" alt="I Want to Eat Your Pancreas" loading="lazy">
+            <div class="title">I Want to Eat Your Pancreas</div>
+        </a>
+        <a href="i was reincarnated as the 7th prince.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx156415-zwP9deA786S1.jpg" alt="I Was Reincarnated as the 7th Prince so I Can Take My Time Perfecting My Magical Ability" loading="lazy">
+            <div class="title">I Was Reincarnated as the 7th Prince so I Can Take My Time Perfecting My Magical Ability</div>
+        </a>
+        <a href="initial d.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b185-GvXiR8AKTmdn.jpg" alt="Initial D" loading="lazy">
+            <div class="title">Initial D</div>
+        </a>
+        <a href="jujutsu kaisen.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx113415-LHBAeoZDIsnF.jpg" alt="JUJUTSU KAISEN" loading="lazy">
+            <div class="title">JUJUTSU KAISEN</div>
+        </a>
+        <a href="kagerou project.html" class="card">
+            <img src="https://m.media-amazon.com/images/I/81Ygcib-l6L._AC_UF1000,1000_QL80_.jpg" alt="Kagerou Project" loading="lazy">
+            <div class="title">Kagerou Project</div>
+        </a>
+        <a href="kamisama kiss.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx14713-RyZ7bA7CdvGw.jpg" alt="Kamisama Kiss" loading="lazy">
+            <div class="title">Kamisama Kiss</div>
+        </a>
+        <a href="letter bee.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b6444-Eiizf1cvuOg5.jpg" alt="Letter Bee" loading="lazy">
+            <div class="title">Letter Bee</div>
+        </a>
+        <a href="lord of the mysteries.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx137667-xQxzQRAerw53.jpg" alt="Lord of Mysteries" loading="lazy">
+            <div class="title">Lord of Mysteries</div>
+        </a>
+        <a href="macross 7.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1397-D9MLYHZhOnYO.png" alt="Macross 7" loading="lazy">
+            <div class="title">Macross 7</div>
+        </a>
+        <a href="mob psycho 100.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21507-6YUSbh2m0N1p.jpg" alt="Mob Psycho 100" loading="lazy">
+            <div class="title">Mob Psycho 100</div>
+        </a>
+        <a href="mobile suit gundam.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx80-pdYJ12vSTmad.jpg" alt="Mobile Suit Gundam" loading="lazy">
+            <div class="title">Mobile Suit Gundam</div>
+        </a>
+        <a href="monogatari series.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx17074-xMhVAZsEDH66.png" alt="Monogatari Series" loading="lazy">
+            <div class="title">Monogatari Series</div>
+        </a>
+        <a href="monster.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx19-gtMC64182sm4.jpg" alt="Monster" loading="lazy">
+            <div class="title">Monster</div>
+        </a>
+        <a href="my hero academia.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21459-nYh85uj2Fuwr.jpg" alt="My Hero Academia" loading="lazy">
+            <div class="title">My Hero Academia</div>
+        </a>
+        <a href="naruto.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20-dE6UHbFFg1A5.jpg" alt="Naruto" loading="lazy">
+            <div class="title">Naruto</div>
+        </a>
+        <a href="oshi no ko.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx150672-WqmmwZ4nMzAy.png" alt="Oshi No Ko" loading="lazy">
+            <div class="title">Oshi No Ko</div>
+        </a>
+        <a href="project sekai.html" class="card">
+            <img src="https://jpbookstore.com/cdn/shop/products/81HpEeOnSBL_1260x1789.jpg" alt="Project SEKAI COLORFUL STAGE!" loading="lazy">
+            <div class="title">Project SEKAI COLORFUL STAGE!</div>
+        </a>
+        <a href="rascal does not dream of bunny girl senpai.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101291-wfEdgPqtfU0l.jpg" alt="Rascal Does Not Dream of Bunny Girl Senpai" loading="lazy">
+            <div class="title">Rascal Does Not Dream of Bunny Girl Senpai</div>
+        </a>
+        <a href="secret lady.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx133797-R7xbGOuFUeoq.jpg" alt="Secret Lady" loading="lazy">
+            <div class="title">Secret Lady</div>
+        </a>
+        <a href="serial experiments lain.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx339-xF2wp1NQuQ4r.png" alt="Serial Experiments Lain" loading="lazy">
+            <div class="title">Serial Experiments Lain</div>
+        </a>
+        <a href="shaman king.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx154-hSYv4EtcBE1p.png" alt="Shaman King" loading="lazy">
+            <div class="title">Shaman King</div>
+        </a>
+        <a href="skip and loafer.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx141911-o6Jwav7hRPPM.jpg" alt="Skip and Loafer" loading="lazy">
+            <div class="title">Skip and Loafer</div>
+        </a>
+        <a href="solo leveling.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx151807-it355ZgzquUd.png" alt="Solo Leveling" loading="lazy">
+            <div class="title">Solo Leveling</div>
+        </a>
+        <a href="sound euphonium.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20912-SiiG4HPrjQlX.jpg" alt="Sound! Euphonium" loading="lazy">
+            <div class="title">Sound! Euphonium</div>
+        </a>
+        <a href="spy x family.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx140960-Kb6R5nYQfjmP.jpg" alt="SPY x FAMILY" loading="lazy">
+            <div class="title">SPY x FAMILY</div>
+        </a>
+        <a href="steel ball run.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx190327-fIfMy1LTkdGP.jpg" alt="STEEL BALL RUN JoJo's Bizarre Adventure" loading="lazy">
+            <div class="title">STEEL BALL RUN JoJo's Bizarre Adventure</div>
+        </a>
+        <a href="steins_gate.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx9253-tIUXF2gfU8Sg.jpg" alt="Steins;Gate" loading="lazy">
+            <div class="title">Steins;Gate</div>
+        </a>
+        <a href="that time i got reincarnated as a slime.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101280-tDxCVJm714nt.jpg" alt="That Time I Got Reincarnated as a Slime" loading="lazy">
+            <div class="title">That Time I Got Reincarnated as a Slime</div>
+        </a>
+        <a href="the apothecary diaries.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx161645-QLbzHXiYRgV2.jpg" alt="The Apothecary Diaries" loading="lazy">
+            <div class="title">The Apothecary Diaries</div>
+        </a>
+        <a href="the ossan newbie adventurer.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx163292-1DkPP4r5UI9Y.jpg" alt="The Ossan Newbie Adventurer, Trained to Death by the Most Powerful Party, Became Invincible" loading="lazy">
+            <div class="title">The Ossan Newbie Adventurer, Trained to Death by the Most Powerful Party, Became Invincible</div>
+        </a>
+        <a href="toilet-bound hanako-kun.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx108463-u03vrYnyB3L9.jpg" alt="Toilet-bound Hanako-kun" loading="lazy">
+            <div class="title">Toilet-bound Hanako-kun</div>
+        </a>
+        <a href="tokyo ghoul.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b20605-k665mVkSug8D.jpg" alt="Tokyo Ghoul" loading="lazy">
+            <div class="title">Tokyo Ghoul</div>
+        </a>
+        <a href="tougen anki.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx177474-oHil1yLWldfl.jpg" alt="TOUGEN ANKI" loading="lazy">
+            <div class="title">TOUGEN ANKI</div>
+        </a>
+        <a href="usogui.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx13303-RsJ5jAwDF64x.png" alt="Usogui" loading="lazy">
+            <div class="title">Usogui</div>
+        </a>
+        <a href="vinland saga.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101348-2fhDFPCuMNiz.jpg" alt="Vinland Saga" loading="lazy">
+            <div class="title">Vinland Saga</div>
+        </a>
+        <a href="violet evergarden.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21827-ubzq619ZA2E9.png" alt="Violet Evergarden" loading="lazy">
+            <div class="title">Violet Evergarden</div>
+        </a>
+        <a href="wind breaker.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx163270-wboZJp0ybwVK.jpg" alt="WIND BREAKER" loading="lazy">
+            <div class="title">WIND BREAKER</div>
+        </a>
+        <a href="yona of the dawn.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20770-brCDvhTXlums.png" alt="Yona of the Dawn" loading="lazy">
+            <div class="title">Yona of the Dawn</div>
+        </a>
+        <a href="your lie in april.html" class="card">
+            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20665-TLgkL8T8IRFd.png" alt="Your lie in April" loading="lazy">
+            <div class="title">Your lie in April</div>
+        </a>
+    </div>
+    <script>
+        function filterSeries() {
+            const input = document.getElementById('searchBar');
+            const filter = input.value.toLowerCase();
+            const cards = document.getElementsByClassName('card');
+            for (let i = 0; i < cards.length; i++) {
+                const title = cards[i].querySelector('.title').innerText.toLowerCase();
+                cards[i].style.display = title.includes(filter) ? "" : "none";
+            }
+        }
+    </script>
+</body></html>
