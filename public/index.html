@@ -2,265 +2,98 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>croixph's badges</title><link rel="stylesheet" href="style.css">
+    <title>croixph's badges</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #121212; color: #ffffff; margin: 0; padding: 0; }
+        .header-container { padding: 40px 20px; background-color: #1a1a1a; border-bottom: 2px solid #333; text-align: center; }
+        h1 { font-size: 2.5em; margin: 0 0 10px 0; color: #e0e0e0; }
+        #searchBar { width: 80%; max-width: 400px; padding: 12px 20px; margin: 20px 0; border-radius: 25px; border: 1px solid #444; background: #222; color: white; font-size: 16px; outline: none; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .card { background: #1e1e1e; border-radius: 12px; overflow: hidden; text-decoration: none; color: white; transition: 0.2s; display: flex; flex-direction: column; cursor: pointer; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .card img { width: 100%; height: 300px; object-fit: cover; }
+        .card .title { padding: 15px; font-weight: bold; background: #222; flex-grow: 1; display: flex; align-items: center; justify-content: center; }
+        .badge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .badge-grid img { width: 100%; border-radius: 8px; cursor: pointer; transition: 0.2s; background: #222; }
+        .badge-grid img:hover { transform: scale(1.05); }
+        .back-btn { position: fixed; top: 20px; left: 20px; width: 40px; height: 40px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 100; cursor: pointer; border: none; color: white; }
+        .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; }
+        .modal img { max-width: 90%; max-height: 90%; border-radius: 8px; }
+        [v-cloak] { display: none; }
+    </style>
 </head>
 <body>
-    <div class="header-container">
-        <h1>croixph's badges</h1>
-        <input type="text" id="searchBar" onkeyup="filterSeries()" placeholder="Search series...">
-        <h2 style="font-size:1em;">Category names are based on the AniList ENGLISH title.<br>Exceptions include collection series (e.g. Fate, Monogatari) and anything not on AniList.<br>In that case, follow your heart.</h2>
+    <div id="app" v-cloak>
+        <div v-if="!activeId">
+            <div class="header-container">
+                <h1>croixph's badges</h1>
+                <input type="text" v-model="search" id="searchBar" placeholder="Search series...">
+                <h2 style="font-size: 1em; color: #a0a0a0; font-weight: 400;">Category names are based on the AniList ENGLISH title.<br>Exceptions include collection series (e.g. Fate, Monogatari) and anything not on AniList.<br>In that case, follow your heart.</h2>
+            </div>
+            <div class="grid">
+                <a v-for="s in filteredSeries" :key="s.id" :href="'#' + encodeURIComponent(s.id)" class="card">
+                    <img :src="s.cover" :alt="s.title" loading="lazy">
+                    <div class="title">{{ s.title }}</div>
+                </a>
+            </div>
+        </div>
+
+        <div v-else>
+            <button class="back-btn" @click="goHome">
+                <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path></svg>
+            </button>
+            <div class="header-container">
+                <h2>{{ currentSeries?.title || 'Loading...' }}</h2>
+            </div>
+            <div class="badge-grid" v-if="currentSeries">
+                <img v-for="img in currentSeries.images" 
+                     :key="img" 
+                     :src="'series/' + currentSeries.id + '/' + img" 
+                     @click="selectedImg = 'series/' + currentSeries.id + '/' + img">
+            </div>
+        </div>
+
+        <div v-if="selectedImg" class="modal" @click="selectedImg = null">
+            <img :src="selectedImg">
+        </div>
     </div>
-    <div class="grid" id="seriesGrid">
-        <a href="86.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx116589-qT34qzsZtk9V.jpg" alt="86 EIGHTY-SIX" loading="lazy">
-            <div class="title">86 EIGHTY-SIX</div>
-        </a>
-        <a href="a sign of affection.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx166794-1MAXFMgND6qS.jpg" alt="A Sign of Affection" loading="lazy">
-            <div class="title">A Sign of Affection</div>
-        </a>
-        <a href="AKIRA.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx126016-9PaIQHxFyyho.png" alt="AKIRA (Shin Anime)" loading="lazy">
-            <div class="title">AKIRA (Shin Anime)</div>
-        </a>
-        <a href="alya sometimes hides her feelings in russian.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx162804-TBeptcAfvqTd.jpg" alt="Alya Sometimes Hides Her Feelings in Russian" loading="lazy">
-            <div class="title">Alya Sometimes Hides Her Feelings in Russian</div>
-        </a>
-        <a href="attack on titan.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx16498-buvcRTBx4NSm.jpg" alt="Attack on Titan" loading="lazy">
-            <div class="title">Attack on Titan</div>
-        </a>
-        <a href="birdie wing.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx140830-hHqRY63VwOp2.jpg" alt="BIRDIE WING -Golf Girls' Story-" loading="lazy">
-            <div class="title">BIRDIE WING -Golf Girls' Story-</div>
-        </a>
-        <a href="bleach.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx269-d2GmRkJbMopq.png" alt="Bleach" loading="lazy">
-            <div class="title">Bleach</div>
-        </a>
-        <a href="blue lock.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx137822-U8naszP96vzC.png" alt="BLUE LOCK" loading="lazy">
-            <div class="title">BLUE LOCK</div>
-        </a>
-        <a href="bungou stray dogs.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21311-hAXyT8Yoh6G9.jpg" alt="Bungo Stray Dogs" loading="lazy">
-            <div class="title">Bungo Stray Dogs</div>
-        </a>
-        <a href="dandadan.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx171018-60q1B6GK2Ghb.jpg" alt="DAN DA DAN" loading="lazy">
-            <div class="title">DAN DA DAN</div>
-        </a>
-        <a href="delicious in dungeon.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx153518-IVXPDY5ph3kO.jpg" alt="Delicious in Dungeon" loading="lazy">
-            <div class="title">Delicious in Dungeon</div>
-        </a>
-        <a href="demon slayer.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101922-WBsBl0ClmgYL.jpg" alt="Demon Slayer" loading="lazy">
-            <div class="title">Demon Slayer</div>
-        </a>
-        <a href="dr stone.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx105333-GybuoSoOZfpH.jpg" alt="Dr. STONE" loading="lazy">
-            <div class="title">Dr. STONE</div>
-        </a>
-        <a href="fate.html" class="card">
-            <img src="https://m.media-amazon.com/images/M/MV5BZTNmZWI3ZWYtNjkzYi00ZTFkLWI0MzctMjc2YzlmNGRkNzRiXkEyXkFqcGc@._V1_.jpg" alt="Fate Series" loading="lazy">
-            <div class="title">Fate Series</div>
-        </a>
-        <a href="FLCL.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx227-qOB9ZhVvNnqO.jpg" alt="FLCL" loading="lazy">
-            <div class="title">FLCL</div>
-        </a>
-        <a href="given.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx108430-UdruJPro4vDK.jpg" alt="given" loading="lazy">
-            <div class="title">given</div>
-        </a>
-        <a href="haikyuu.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20464-ooZUyBe4ptp9.png" alt="HAIKYU!!" loading="lazy">
-            <div class="title">HAIKYU!!</div>
-        </a>
-        <a href="hell's paradise.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx128893-Gc2t8b8M0mVu.jpg" alt="Hell’s Paradise" loading="lazy">
-            <div class="title">Hell’s Paradise</div>
-        </a>
-        <a href="horimiya.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx124080-oeviACzGv5Vx.jpg" alt="Horimiya" loading="lazy">
-            <div class="title">Horimiya</div>
-        </a>
-        <a href="how to win my husband over.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx141013-YZhKrs2IqxWY.png" alt="How to Win My Husband Over" loading="lazy">
-            <div class="title">How to Win My Husband Over</div>
-        </a>
-        <a href="hunter x hunter.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11061-y5gsT1hoHuHw.png" alt="Hunter X Hunter" loading="lazy">
-            <div class="title">Hunter X Hunter</div>
-        </a>
-        <a href="i want to eat your pancreas.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx99750-pNyly9d3MEgV.jpg" alt="I Want to Eat Your Pancreas" loading="lazy">
-            <div class="title">I Want to Eat Your Pancreas</div>
-        </a>
-        <a href="i was reincarnated as the 7th prince.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx156415-zwP9deA786S1.jpg" alt="I Was Reincarnated as the 7th Prince so I Can Take My Time Perfecting My Magical Ability" loading="lazy">
-            <div class="title">I Was Reincarnated as the 7th Prince so I Can Take My Time Perfecting My Magical Ability</div>
-        </a>
-        <a href="initial d.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b185-GvXiR8AKTmdn.jpg" alt="Initial D" loading="lazy">
-            <div class="title">Initial D</div>
-        </a>
-        <a href="jujutsu kaisen.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx113415-LHBAeoZDIsnF.jpg" alt="JUJUTSU KAISEN" loading="lazy">
-            <div class="title">JUJUTSU KAISEN</div>
-        </a>
-        <a href="kagerou project.html" class="card">
-            <img src="https://m.media-amazon.com/images/I/81Ygcib-l6L._AC_UF1000,1000_QL80_.jpg" alt="Kagerou Project" loading="lazy">
-            <div class="title">Kagerou Project</div>
-        </a>
-        <a href="kamisama kiss.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx14713-RyZ7bA7CdvGw.jpg" alt="Kamisama Kiss" loading="lazy">
-            <div class="title">Kamisama Kiss</div>
-        </a>
-        <a href="letter bee.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b6444-Eiizf1cvuOg5.jpg" alt="Letter Bee" loading="lazy">
-            <div class="title">Letter Bee</div>
-        </a>
-        <a href="lord of the mysteries.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx137667-xQxzQRAerw53.jpg" alt="Lord of Mysteries" loading="lazy">
-            <div class="title">Lord of Mysteries</div>
-        </a>
-        <a href="macross 7.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1397-D9MLYHZhOnYO.png" alt="Macross 7" loading="lazy">
-            <div class="title">Macross 7</div>
-        </a>
-        <a href="mob psycho 100.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21507-6YUSbh2m0N1p.jpg" alt="Mob Psycho 100" loading="lazy">
-            <div class="title">Mob Psycho 100</div>
-        </a>
-        <a href="mobile suit gundam.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx80-pdYJ12vSTmad.jpg" alt="Mobile Suit Gundam" loading="lazy">
-            <div class="title">Mobile Suit Gundam</div>
-        </a>
-        <a href="monogatari series.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx17074-xMhVAZsEDH66.png" alt="Monogatari Series" loading="lazy">
-            <div class="title">Monogatari Series</div>
-        </a>
-        <a href="monster.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx19-gtMC64182sm4.jpg" alt="Monster" loading="lazy">
-            <div class="title">Monster</div>
-        </a>
-        <a href="my hero academia.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21459-nYh85uj2Fuwr.jpg" alt="My Hero Academia" loading="lazy">
-            <div class="title">My Hero Academia</div>
-        </a>
-        <a href="naruto.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20-dE6UHbFFg1A5.jpg" alt="Naruto" loading="lazy">
-            <div class="title">Naruto</div>
-        </a>
-        <a href="oshi no ko.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx150672-WqmmwZ4nMzAy.png" alt="Oshi No Ko" loading="lazy">
-            <div class="title">Oshi No Ko</div>
-        </a>
-        <a href="project sekai.html" class="card">
-            <img src="https://jpbookstore.com/cdn/shop/products/81HpEeOnSBL_1260x1789.jpg" alt="Project SEKAI COLORFUL STAGE!" loading="lazy">
-            <div class="title">Project SEKAI COLORFUL STAGE!</div>
-        </a>
-        <a href="rascal does not dream of bunny girl senpai.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101291-wfEdgPqtfU0l.jpg" alt="Rascal Does Not Dream of Bunny Girl Senpai" loading="lazy">
-            <div class="title">Rascal Does Not Dream of Bunny Girl Senpai</div>
-        </a>
-        <a href="secret lady.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx133797-R7xbGOuFUeoq.jpg" alt="Secret Lady" loading="lazy">
-            <div class="title">Secret Lady</div>
-        </a>
-        <a href="serial experiments lain.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx339-xF2wp1NQuQ4r.png" alt="Serial Experiments Lain" loading="lazy">
-            <div class="title">Serial Experiments Lain</div>
-        </a>
-        <a href="shaman king.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx154-hSYv4EtcBE1p.png" alt="Shaman King" loading="lazy">
-            <div class="title">Shaman King</div>
-        </a>
-        <a href="skip and loafer.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx141911-o6Jwav7hRPPM.jpg" alt="Skip and Loafer" loading="lazy">
-            <div class="title">Skip and Loafer</div>
-        </a>
-        <a href="solo leveling.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx151807-it355ZgzquUd.png" alt="Solo Leveling" loading="lazy">
-            <div class="title">Solo Leveling</div>
-        </a>
-        <a href="sound euphonium.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20912-SiiG4HPrjQlX.jpg" alt="Sound! Euphonium" loading="lazy">
-            <div class="title">Sound! Euphonium</div>
-        </a>
-        <a href="spy x family.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx140960-Kb6R5nYQfjmP.jpg" alt="SPY x FAMILY" loading="lazy">
-            <div class="title">SPY x FAMILY</div>
-        </a>
-        <a href="steel ball run.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx190327-fIfMy1LTkdGP.jpg" alt="STEEL BALL RUN JoJo's Bizarre Adventure" loading="lazy">
-            <div class="title">STEEL BALL RUN JoJo's Bizarre Adventure</div>
-        </a>
-        <a href="steins_gate.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx9253-tIUXF2gfU8Sg.jpg" alt="Steins;Gate" loading="lazy">
-            <div class="title">Steins;Gate</div>
-        </a>
-        <a href="that time i got reincarnated as a slime.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101280-tDxCVJm714nt.jpg" alt="That Time I Got Reincarnated as a Slime" loading="lazy">
-            <div class="title">That Time I Got Reincarnated as a Slime</div>
-        </a>
-        <a href="the apothecary diaries.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx161645-QLbzHXiYRgV2.jpg" alt="The Apothecary Diaries" loading="lazy">
-            <div class="title">The Apothecary Diaries</div>
-        </a>
-        <a href="the ossan newbie adventurer.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx163292-1DkPP4r5UI9Y.jpg" alt="The Ossan Newbie Adventurer, Trained to Death by the Most Powerful Party, Became Invincible" loading="lazy">
-            <div class="title">The Ossan Newbie Adventurer, Trained to Death by the Most Powerful Party, Became Invincible</div>
-        </a>
-        <a href="toilet-bound hanako-kun.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx108463-u03vrYnyB3L9.jpg" alt="Toilet-bound Hanako-kun" loading="lazy">
-            <div class="title">Toilet-bound Hanako-kun</div>
-        </a>
-        <a href="tokyo ghoul.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b20605-k665mVkSug8D.jpg" alt="Tokyo Ghoul" loading="lazy">
-            <div class="title">Tokyo Ghoul</div>
-        </a>
-        <a href="tougen anki.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx177474-oHil1yLWldfl.jpg" alt="TOUGEN ANKI" loading="lazy">
-            <div class="title">TOUGEN ANKI</div>
-        </a>
-        <a href="usogui.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx13303-RsJ5jAwDF64x.png" alt="Usogui" loading="lazy">
-            <div class="title">Usogui</div>
-        </a>
-        <a href="vinland saga.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101348-2fhDFPCuMNiz.jpg" alt="Vinland Saga" loading="lazy">
-            <div class="title">Vinland Saga</div>
-        </a>
-        <a href="violet evergarden.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21827-ubzq619ZA2E9.png" alt="Violet Evergarden" loading="lazy">
-            <div class="title">Violet Evergarden</div>
-        </a>
-        <a href="wind breaker.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx163270-wboZJp0ybwVK.jpg" alt="WIND BREAKER" loading="lazy">
-            <div class="title">WIND BREAKER</div>
-        </a>
-        <a href="yona of the dawn.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20770-brCDvhTXlums.png" alt="Yona of the Dawn" loading="lazy">
-            <div class="title">Yona of the Dawn</div>
-        </a>
-        <a href="your lie in april.html" class="card">
-            <img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20665-TLgkL8T8IRFd.png" alt="Your lie in April" loading="lazy">
-            <div class="title">Your lie in April</div>
-        </a>
-    </div>
+
     <script>
-        function filterSeries() {
-            const input = document.getElementById('searchBar');
-            const filter = input.value.toLowerCase();
-            const cards = document.getElementsByClassName('card');
-            for (let i = 0; i < cards.length; i++) {
-                const title = cards[i].querySelector('.title').innerText.toLowerCase();
-                cards[i].style.display = title.includes(filter) ? "" : "none";
+        const { createApp, ref, computed, onMounted } = Vue;
+        const seriesData = [{"id": "86", "title": "86 EIGHTY-SIX", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx116589-qT34qzsZtk9V.jpg", "images": ["shineinouzen.png", "vladilenamilize.png"]}, {"id": "a sign of affection", "title": "A Sign of Affection", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx166794-1MAXFMgND6qS.jpg", "images": ["itsuyuki.gif", "yukiitsuomi.png"]}, {"id": "AKIRA", "title": "AKIRA (Shin Anime)", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx126016-9PaIQHxFyyho.png", "images": ["kanedashotaro.png", "tetsuoshima.png"]}, {"id": "alya sometimes hides her feelings in russian", "title": "Alya Sometimes Hides Her Feelings in Russian", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx162804-TBeptcAfvqTd.jpg", "images": ["alya.png"]}, {"id": "attack on titan", "title": "Attack on Titan", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx16498-buvcRTBx4NSm.jpg", "images": ["eren1.png", "levi1.png", "levi2.png"]}, {"id": "birdie wing", "title": "BIRDIE WING -Golf Girls' Story-", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx140830-hHqRY63VwOp2.jpg", "images": ["eveandaoi.png"]}, {"id": "bleach", "title": "Bleach", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx269-d2GmRkJbMopq.png", "images": ["ichigokurosaki.png"]}, {"id": "blue lock", "title": "BLUE LOCK", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx137822-U8naszP96vzC.png", "images": ["chigiri.png", "nagi.png", "nagireo.png", "yoichi.png"]}, {"id": "bungou stray dogs", "title": "Bungo Stray Dogs", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21311-hAXyT8Yoh6G9.jpg", "images": ["chuuya.png", "dazai.png", "soukoku.png"]}, {"id": "dandadan", "title": "DAN DA DAN", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx171018-60q1B6GK2Ghb.jpg", "images": ["ken.gif", "ken.png"]}, {"id": "delicious in dungeon", "title": "Delicious in Dungeon", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx153518-IVXPDY5ph3kO.jpg", "images": ["falin.png", "laios.png", "marcille.png", "senshi.png"]}, {"id": "demon slayer", "title": "Demon Slayer", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101922-WBsBl0ClmgYL.jpg", "images": ["kamadanzuko.png", "nezuko.gif", "rengoku.gif", "rengoku.png"]}, {"id": "dr stone", "title": "Dr. STONE", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx105333-GybuoSoOZfpH.jpg", "images": ["senku.png"]}, {"id": "fate", "title": "Fate Series", "cover": "https://m.media-amazon.com/images/M/MV5BZTNmZWI3ZWYtNjkzYi00ZTFkLWI0MzctMjc2YzlmNGRkNzRiXkEyXkFqcGc@._V1_.jpg", "images": ["lanling wang 2.png", "lanling wang.png"]}, {"id": "FLCL", "title": "FLCL", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx227-qOB9ZhVvNnqO.jpg", "images": ["canti.gif", "canti.png"]}, {"id": "given", "title": "given", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx108430-UdruJPro4vDK.jpg", "images": ["kaji.png", "mafuyu.png", "shizusumi.png", "ugetsu.gif", "ugetsu.png"]}, {"id": "haikyuu", "title": "HAIKYU!!", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20464-ooZUyBe4ptp9.png", "images": ["kageyama.png", "kenma.png", "kuroo.png", "nishinoya.png", "oikawa.png", "sugawara.png", "tsukishima.png"]}, {"id": "hell's paradise", "title": "Hell\u2019s Paradise", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx128893-Gc2t8b8M0mVu.jpg", "images": ["gabimaru.png"]}, {"id": "horimiya", "title": "Horimiya", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx124080-oeviACzGv5Vx.jpg", "images": ["horimiya.png", "izumi.png"]}, {"id": "how to win my husband over", "title": "How to Win My Husband Over", "cover": "https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx141013-YZhKrs2IqxWY.png", "images": ["iske van omerta.png", "ruby.png"]}, {"id": "hunter x hunter", "title": "Hunter X Hunter", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11061-y5gsT1hoHuHw.png", "images": ["gon.png", "hisoka.png", "killua.png", "meruem.png", "neferpitou.png"]}, {"id": "i want to eat your pancreas", "title": "I Want to Eat Your Pancreas", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx99750-pNyly9d3MEgV.jpg", "images": ["sakurayamauchi.png", "yamauchi.gif"]}, {"id": "i was reincarnated as the 7th prince", "title": "I Was Reincarnated as the 7th Prince so I Can Take My Time Perfecting My Magical Ability", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx156415-zwP9deA786S1.jpg", "images": ["sylpha.gif", "sylpha.png", "talia.gif", "talia.png", "tao.gif", "tao.png"]}, {"id": "initial d", "title": "Initial D", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b185-GvXiR8AKTmdn.jpg", "images": ["takumi fujiwara.png"]}, {"id": "jujutsu kaisen", "title": "JUJUTSU KAISEN", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx113415-LHBAeoZDIsnF.jpg", "images": ["gojo.gif", "gojo.png", "gojo2.gif", "gojo2.png", "gojou1.png", "gojou2.png", "megumi.gif", "megumi.png", "megumi2.gif", "megumi2.png", "ryomensukuna.gif", "ryomensukuna.png", "satorugojo.gif", "satorugojo.png", "sukuna.gif", "sukuna.png", "sukuna2.gif", "sukuna2.png"]}, {"id": "kagerou project", "title": "Kagerou Project", "cover": "https://m.media-amazon.com/images/I/81Ygcib-l6L._AC_UF1000,1000_QL80_.jpg", "images": ["kozakura mary.png"]}, {"id": "kamisama kiss", "title": "Kamisama Kiss", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx14713-RyZ7bA7CdvGw.jpg", "images": ["tomoe.png"]}, {"id": "letter bee", "title": "Letter Bee", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b6444-Eiizf1cvuOg5.jpg", "images": ["gauche.png"]}, {"id": "lord of the mysteries", "title": "Lord of Mysteries", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx137667-xQxzQRAerw53.jpg", "images": ["derrickberg1.png", "derrickberg2.png", "klein.png", "kleinmoretti&amon.png"]}, {"id": "macross 7", "title": "Macross 7", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1397-D9MLYHZhOnYO.png", "images": ["nekkibasara.png"]}, {"id": "mob psycho 100", "title": "Mob Psycho 100", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21507-6YUSbh2m0N1p.jpg", "images": ["reigenarataka.gif", "reigenarataka.png", "shigeokageyama.gif", "shigeokageyama.png"]}, {"id": "mobile suit gundam", "title": "Mobile Suit Gundam", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx80-pdYJ12vSTmad.jpg", "images": ["charaznable.png", "garmazabi.png", "mikazukiaugus.png"]}, {"id": "monogatari series", "title": "Monogatari Series", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx17074-xMhVAZsEDH66.png", "images": ["koyomiararagi.png", "shinobuoshino.png"]}, {"id": "monster", "title": "Monster", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx19-gtMC64182sm4.jpg", "images": ["johan.png"]}, {"id": "my hero academia", "title": "My Hero Academia", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21459-nYh85uj2Fuwr.jpg", "images": ["bakugou.png", "dabi.png", "keigo.png", "miruko.png", "shinsou.png", "shouto.png", "tsuyu.png"]}, {"id": "naruto", "title": "Naruto", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20-dE6UHbFFg1A5.jpg", "images": ["itachi uchiha.png", "kakashi1.png", "kakashi2.png"]}, {"id": "oshi no ko", "title": "Oshi No Ko", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx150672-WqmmwZ4nMzAy.png", "images": ["aihoshino.png", "akanekurokawa.png", "ruby&aquamarine.png"]}, {"id": "project sekai", "title": "Project SEKAI COLORFUL STAGE!", "cover": "https://jpbookstore.com/cdn/shop/products/81HpEeOnSBL_1260x1789.jpg", "images": ["kanade.png"]}, {"id": "rascal does not dream of bunny girl senpai", "title": "Rascal Does Not Dream of Bunny Girl Senpai", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101291-wfEdgPqtfU0l.jpg", "images": ["mai.png", "sakuta.png"]}, {"id": "secret lady", "title": "Secret Lady", "cover": "https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx133797-R7xbGOuFUeoq.jpg", "images": ["charteris kartazen.png"]}, {"id": "serial experiments lain", "title": "Serial Experiments Lain", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx339-xF2wp1NQuQ4r.png", "images": ["lainiwakura.png"]}, {"id": "shaman king", "title": "Shaman King", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx154-hSYv4EtcBE1p.png", "images": ["lysergdiethel.png"]}, {"id": "skip and loafer", "title": "Skip and Loafer", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx141911-o6Jwav7hRPPM.jpg", "images": ["shimamitsu.png"]}, {"id": "solo leveling", "title": "Solo Leveling", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx151807-it355ZgzquUd.png", "images": ["sungjinwoo.gif", "sungjinwoo.png", "sungjinwoo2.png"]}, {"id": "sound euphonium", "title": "Sound! Euphonium", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20912-SiiG4HPrjQlX.jpg", "images": ["kumikooumae.png"]}, {"id": "spy x family", "title": "SPY x FAMILY", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx140960-Kb6R5nYQfjmP.jpg", "images": ["yor&loid.gif", "yor&loid.png"]}, {"id": "steel ball run", "title": "STEEL BALL RUN JoJo's Bizarre Adventure", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx190327-fIfMy1LTkdGP.jpg", "images": ["gyrozeppeli.png"]}, {"id": "steins_gate", "title": "Steins;Gate", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx9253-tIUXF2gfU8Sg.jpg", "images": ["makisekurisu.gif", "makisekurisu.png", "okaberintarou.gif", "okaberintarou.png", "okakuri.gif", "okakuri.png"]}, {"id": "that time i got reincarnated as a slime", "title": "That Time I Got Reincarnated as a Slime", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101280-tDxCVJm714nt.jpg", "images": ["benimaru.png", "diablo.png", "rimuru.png"]}, {"id": "the apothecary diaries", "title": "The Apothecary Diaries", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx161645-QLbzHXiYRgV2.jpg", "images": ["maoamao2.png", "maomao1.png", "maomao3.png"]}, {"id": "the ossan newbie adventurer", "title": "The Ossan Newbie Adventurer, Trained to Death by the Most Powerful Party, Became Invincible", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx163292-1DkPP4r5UI9Y.jpg", "images": ["reanette elfelt.png", "reanette.gif"]}, {"id": "toilet-bound hanako-kun", "title": "Toilet-bound Hanako-kun", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx108463-u03vrYnyB3L9.jpg", "images": ["hanako.png", "nene.png"]}, {"id": "tokyo ghoul", "title": "Tokyo Ghoul", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b20605-k665mVkSug8D.jpg", "images": ["kanekiken.gif", "kanekiken.png", "touka kirishima.png", "toukakirishima.gif"]}, {"id": "tougen anki", "title": "TOUGEN ANKI", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx177474-oHil1yLWldfl.jpg", "images": ["ichinoseshiki.png", "shiki.gif"]}, {"id": "usogui", "title": "Usogui", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx13303-RsJ5jAwDF64x.png", "images": ["bakumadarame.png", "kirumasouichi.png", "vincentlalo.png"]}, {"id": "vinland saga", "title": "Vinland Saga", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101348-2fhDFPCuMNiz.jpg", "images": ["thorfinn.png"]}, {"id": "violet evergarden", "title": "Violet Evergarden", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21827-ubzq619ZA2E9.png", "images": ["violet evergarden.png"]}, {"id": "wind breaker", "title": "WIND BREAKER", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx163270-wboZJp0ybwVK.jpg", "images": ["harukasakura.gif", "harukasakura.png"]}, {"id": "yona of the dawn", "title": "Yona of the Dawn", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20770-brCDvhTXlums.png", "images": ["hak son.png"]}, {"id": "your lie in april", "title": "Your lie in April", "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20665-TLgkL8T8IRFd.png", "images": ["arimamiyazono.gif", "miyazonoarima1.png"]}];
+
+        createApp({
+            setup() {
+                const search = ref('');
+                const activeId = ref('');
+                const selectedImg = ref(null);
+
+                const getHash = () => decodeURIComponent(window.location.hash.replace('#', ''));
+
+                const filteredSeries = computed(() => 
+                    seriesData.filter(s => s.title.toLowerCase().includes(search.value.toLowerCase()))
+                );
+
+                const currentSeries = computed(() => 
+                    seriesData.find(s => s.id === activeId.value)
+                );
+
+                const goHome = () => { window.location.hash = ''; };
+
+                const updateRoute = () => {
+                    activeId.value = getHash();
+                    window.scrollTo(0, 0);
+                };
+
+                onMounted(() => {
+                    window.addEventListener('hashchange', updateRoute);
+                    updateRoute(); // Initial check
+                });
+
+                return { search, activeId, filteredSeries, currentSeries, goHome, selectedImg };
             }
-        }
+        }).mount('#app');
     </script>
-</body></html>
+</body>
+</html>
