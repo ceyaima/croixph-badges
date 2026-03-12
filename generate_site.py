@@ -85,7 +85,6 @@ def main():
 
     series_data.sort(key=lambda x: str(x['title']).lower())
 
-    # Bundle everything into one HTML file
     index_html_path = os.path.join(OUTPUT_DIR, "index.html")
     json_payload = json.dumps(series_data)
     
@@ -97,21 +96,36 @@ def main():
     <title>croixph's badges</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <style>
-        body {{ font-family: 'Segoe UI', sans-serif; background-color: #121212; color: #ffffff; margin: 0; padding: 0; }}
-        .header-container {{ padding: 40px 20px; background-color: #1a1a1a; border-bottom: 2px solid #333; text-align: center; }}
-        h1 {{ font-size: 2.5em; margin: 0 0 10px 0; color: #e0e0e0; }}
-        #searchBar {{ width: 80%; max-width: 400px; padding: 12px 20px; margin: 20px 0; border-radius: 25px; border: 1px solid #444; background: #222; color: white; font-size: 16px; outline: none; }}
-        .grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; max-width: 1200px; margin: 30px auto; padding: 0 20px; }}
-        .card {{ background: #1e1e1e; border-radius: 12px; overflow: hidden; text-decoration: none; color: white; transition: 0.2s; display: flex; flex-direction: column; cursor: pointer; }}
-        .card:hover {{ transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }}
-        .card img {{ width: 100%; height: 300px; object-fit: cover; }}
-        .card .title {{ padding: 15px; font-weight: bold; background: #222; flex-grow: 1; display: flex; align-items: center; justify-content: center; }}
-        .badge-grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; max-width: 1200px; margin: 0 auto; padding: 20px; }}
-        .badge-grid img {{ width: 100%; border-radius: 8px; cursor: pointer; transition: 0.2s; background: #222; }}
-        .badge-grid img:hover {{ transform: scale(1.05); }}
-        .back-btn {{ position: fixed; top: 20px; left: 20px; width: 40px; height: 40px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 100; cursor: pointer; border: none; color: white; }}
-        .modal {{ position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; }}
-        .modal img {{ max-width: 90%; max-height: 90%; border-radius: 8px; }}
+        :root {{ --bg: #121212; --card-bg: #1e1e1e; --accent: #007bff; --text: #e0e0e0; }}
+        body {{ font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; }}
+        
+        .header-container {{ padding: 60px 20px; background-color: #1a1a1a; border-bottom: 2px solid #333; text-align: center; }}
+        h1 {{ font-size: 2.8em; margin: 0 0 10px 0; letter-spacing: -1px; }}
+        
+        #searchBar {{ width: 85%; max-width: 500px; padding: 14px 24px; margin-top: 25px; border-radius: 30px; border: 1px solid #444; background: #222; color: white; font-size: 16px; outline: none; transition: 0.3s; }}
+        #searchBar:focus {{ border-color: var(--accent); box-shadow: 0 0 0 4px rgba(0,123,255,0.2); }}
+
+        .grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 30px; max-width: 1300px; margin: 40px auto; padding: 0 20px; }}
+        
+        /* Lazy loading fade-in effect */
+        img {{ opacity: 0; transition: opacity 0.6s ease-in-out; }}
+        img.loaded {{ opacity: 1; }}
+
+        .card {{ background: var(--card-bg); border-radius: 15px; overflow: hidden; text-decoration: none; color: inherit; transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column; cursor: pointer; border: 1px solid #2a2a2a; }}
+        .card:hover {{ transform: translateY(-8px); border-color: #444; box-shadow: 0 12px 24px rgba(0,0,0,0.5); }}
+        .card img {{ width: 100%; height: 320px; object-fit: cover; background: #222; }}
+        .card .title {{ padding: 18px; font-weight: 600; font-size: 1.05em; background: #252525; flex-grow: 1; display: flex; align-items: center; justify-content: center; text-align: center; }}
+        
+        .badge-grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; max-width: 1300px; margin: 0 auto; padding: 40px 20px; }}
+        .badge-grid img {{ width: 100%; border-radius: 10px; cursor: pointer; background: #1a1a1a; }}
+        .badge-grid img:hover {{ transform: scale(1.03); }}
+        
+        .back-btn {{ position: fixed; top: 25px; left: 25px; width: 45px; height: 45px; background: rgba(50,50,50,0.8); backdrop-filter: blur(5px); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 100; cursor: pointer; border: 1px solid #444; color: white; transition: 0.2s; }}
+        .back-btn:hover {{ background: var(--accent); border-color: var(--accent); }}
+
+        .modal {{ position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); }}
+        .modal img {{ max-width: 90%; max-height: 90%; border-radius: 12px; box-shadow: 0 0 50px rgba(0,0,0,0.8); opacity: 1; }}
+        
         [v-cloak] {{ display: none; }}
     </style>
 </head>
@@ -120,12 +134,12 @@ def main():
         <div v-if="!activeId">
             <div class="header-container">
                 <h1>croixph's badges</h1>
-                <input type="text" v-model="search" id="searchBar" placeholder="Search series...">
-                <h2 style="font-size: 0.8em; color: #a0a0a0; font-weight: 400;">Category names are based on the AniList ENGLISH title.<br>Exceptions include collection series (e.g. Fate, Monogatari) and anything not on AniList.<br>In that case, follow your heart.</h2>
+                <input type="text" v-model="search" id="searchBar" placeholder="Search category...">
+                <h2 style="font-size: 0.8em; color: rgb(160, 160, 160); font-weight: 400;">Category names are based on the AniList ENGLISH title.<br>Exceptions include collection series (e.g. Fate, Monogatari) and anything not on AniList.<br>In that case, follow your heart.</h2>
             </div>
             <div class="grid">
                 <a v-for="s in filteredSeries" :key="s.id" :href="'#' + encodeURIComponent(s.id)" class="card">
-                    <img :src="s.cover" :alt="s.title" loading="lazy">
+                    <img :src="s.cover" :alt="s.title" loading="lazy" @load="onImgLoad">
                     <div class="title">{{{{ s.title }}}}</div>
                 </a>
             </div>
@@ -136,12 +150,15 @@ def main():
                 <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path></svg>
             </button>
             <div class="header-container">
-                <h2>{{{{ currentSeries?.title || 'Loading...' }}}}</h2>
+                <h2 style="margin:0; font-size: 2em;">{{{{ currentSeries?.title || 'Loading...' }}}}</h2>
+                <p style="margin-top:10px; color:#888;">{{{{ currentSeries?.images.length }}}} badges available</p>
             </div>
             <div class="badge-grid" v-if="currentSeries">
                 <img v-for="img in currentSeries.images" 
                      :key="img" 
                      :src="'series/' + currentSeries.id + '/' + img" 
+                     loading="lazy"
+                     @load="onImgLoad"
                      @click="selectedImg = 'series/' + currentSeries.id + '/' + img">
             </div>
         </div>
@@ -152,7 +169,7 @@ def main():
     </div>
 
     <script>
-        const {{ createApp, ref, computed, onMounted }} = Vue;
+        const {{ createApp, ref, computed, onMounted, nextTick }} = Vue;
         const seriesData = {json_payload};
 
         createApp({{
@@ -160,6 +177,7 @@ def main():
                 const search = ref('');
                 const activeId = ref('');
                 const selectedImg = ref(null);
+                const lastScrollPos = ref(0);
 
                 const getHash = () => decodeURIComponent(window.location.hash.replace('#', ''));
 
@@ -171,26 +189,42 @@ def main():
                     seriesData.find(s => s.id === activeId.value)
                 );
 
+                const onImgLoad = (e) => {{
+                    e.target.classList.add('loaded');
+                }};
+
                 const goHome = () => {{ window.location.hash = ''; }};
 
                 const updateRoute = () => {{
-                    activeId.value = getHash();
-                    window.scrollTo(0, 0);
+                    const newId = getHash();
+                    
+                    // If going from series back to home, restore scroll
+                    if (activeId.value && !newId) {{
+                        activeId.value = '';
+                        nextTick(() => window.scrollTo(0, lastScrollPos.value));
+                    }} else if (newId) {{
+                        // If going from home to series, save scroll
+                        if (!activeId.value) lastScrollPos.value = window.scrollY;
+                        activeId.value = newId;
+                        window.scrollTo(0, 0);
+                    }} else {{
+                        activeId.value = '';
+                    }}
                 }};
 
                 onMounted(() => {{
                     window.addEventListener('hashchange', updateRoute);
-                    updateRoute(); // Initial check
+                    updateRoute();
                 }});
 
-                return {{ search, activeId, filteredSeries, currentSeries, goHome, selectedImg }};
+                return {{ search, activeId, filteredSeries, currentSeries, goHome, selectedImg, onImgLoad }};
             }}
         }}).mount('#app');
     </script>
 </body>
 </html>""")
     
-    print(f"\nSuccess! Site generated at {index_html_path}")
+    print(f"\nSuccess! Site with lazy loading and fade-in generated at {index_html_path}")
 
 if __name__ == "__main__":
     main()
