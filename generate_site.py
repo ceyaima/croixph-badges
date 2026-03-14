@@ -71,7 +71,7 @@ def main():
     config = load_config()
     series_data = []
     session = requests.Session()
-    valid_dirs = [d for d in os.listdir(SERIES_DIR) if os.path.isdir(os.path.join(SERIES_DIR, d)) and not d.startswith('.')]
+    valid_dirs =[d for d in os.listdir(SERIES_DIR) if os.path.isdir(os.path.join(SERIES_DIR, d)) and not d.startswith('.')]
 
     print(f"Found {len(valid_dirs)} folders to process...")
     for index, series in enumerate(valid_dirs, 1):
@@ -81,7 +81,34 @@ def main():
         current_series_path = os.path.join(SERIES_DIR, series)
         images = sorted([img for img in os.listdir(current_series_path) if img.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp'))])
         
-        series_data.append({'id': series, 'title': title, 'cover': cover_url, 'images': images})
+        # Group images with the same base name
+        grouped_images = {}
+        for img in images:
+            base, ext = os.path.splitext(img)
+            ext = ext.lower()
+            if base not in grouped_images:
+                grouped_images[base] = {'static': None, 'animated': None}
+            
+            if ext in['.gif', '.webp']:  # Assuming gif/webp might be animated versions
+                grouped_images[base]['animated'] = img
+            else:
+                grouped_images[base]['static'] = img
+                
+        final_images =[]
+        for base, versions in grouped_images.items():
+            static = versions['static']
+            animated = versions['animated']
+            
+            if static and not animated:
+                final_images.append({'base': base, 'display': static, 'has_animated': False, 'animated': None})
+            elif animated and not static:
+                final_images.append({'base': base, 'display': animated, 'has_animated': False, 'animated': None})
+            elif static and animated:
+                final_images.append({'base': base, 'display': static, 'has_animated': True, 'animated': animated})
+
+        final_images.sort(key=lambda x: x['base'].lower())
+        
+        series_data.append({'id': series, 'title': title, 'cover': cover_url, 'images': final_images})
 
     series_data.sort(key=lambda x: str(x['title']).lower())
 
@@ -107,25 +134,71 @@ def main():
 
         .grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 30px; max-width: 1300px; margin: 40px auto; padding: 0 20px; }}
         
+        /* Skeleton Loading Animation */
+        .img-loading-bg {{
+            background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+            background-size: 200% 100%;
+            animation: skeletonLoading 1.5s infinite linear;
+        }}
+        @keyframes skeletonLoading {{
+            0% {{ background-position: 200% 0; }}
+            100% {{ background-position: -200% 0; }}
+        }}
+
         /* Lazy loading fade-in effect */
         img {{ opacity: 0; transition: opacity 0.6s ease-in-out; }}
         img.loaded {{ opacity: 1; }}
 
         .card {{ background: var(--card-bg); border-radius: 15px; overflow: hidden; text-decoration: none; color: inherit; transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column; cursor: pointer; border: 1px solid #2a2a2a; }}
         .card:hover {{ transform: translateY(-8px); border-color: #444; box-shadow: 0 12px 24px rgba(0,0,0,0.5); }}
-        .card img {{ width: 100%; height: 320px; object-fit: cover; background: #222; }}
+        
+        .card-img-container {{ width: 100%; height: 320px; border-bottom: 1px solid #2a2a2a; }}
+        .card-img-container img {{ width: 100%; height: 100%; object-fit: cover; }}
+        
         .card .title {{ padding: 18px; font-weight: 600; font-size: 1.05em; background: #252525; flex-grow: 1; display: flex; align-items: center; justify-content: center; text-align: center; }}
         
         .badge-grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; max-width: 1300px; margin: 0 auto; padding: 40px 20px; }}
-        .badge-grid img {{ width: 100%; border-radius: 10px; cursor: pointer; background: #1a1a1a; }}
-        .badge-grid img:hover {{ transform: scale(1.03); }}
+        
+        .badge-container {{
+            position: relative;
+            width: 100%;
+            min-height: 180px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }}
+        .badge-container img {{ width: 100%; border-radius: 10px; transition: opacity 0.6s ease-in-out, transform 0.2s; }}
+        .badge-container:hover img {{ transform: scale(1.03); }}
+
+        .animated-badge {{
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            pointer-events: none;
+            z-index: 2;
+        }}
         
         .back-btn {{ position: fixed; top: 25px; left: 25px; width: 45px; height: 45px; background: rgba(50,50,50,0.8); backdrop-filter: blur(5px); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 100; cursor: pointer; border: 1px solid #444; color: white; transition: 0.2s; }}
         .back-btn:hover {{ background: var(--accent); border-color: var(--accent); }}
 
         .modal {{ position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); }}
-        .modal img {{ max-width: 90%; max-height: 90%; border-radius: 12px; box-shadow: 0 0 50px rgba(0,0,0,0.8); opacity: 1; }}
         
+        .modal-content {{ position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 90%; max-height: 90%; }}
+        .modal-content img {{ max-width: 100%; max-height: 75vh; border-radius: 12px; box-shadow: 0 0 50px rgba(0,0,0,0.8); opacity: 1; }}
+        
+        .toggle-btn {{ margin-top: 20px; padding: 10px 24px; background: var(--accent); color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 15px; font-weight: bold; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }}
+        .toggle-btn:hover {{ background: #0056b3; transform: scale(1.05); }}
+
         [v-cloak] {{ display: none; }}
     </style>
 </head>
@@ -139,7 +212,9 @@ def main():
             </div>
             <div class="grid">
                 <a v-for="s in filteredSeries" :key="s.id" :href="'#' + encodeURIComponent(s.id)" class="card">
-                    <img :src="s.cover" :alt="s.title" loading="lazy" @load="onImgLoad">
+                    <div class="card-img-container img-loading-bg">
+                        <img :src="s.cover" :alt="s.title" loading="lazy" @load="onImgLoad" decoding="async">
+                    </div>
                     <div class="title">{{{{ s.title }}}}</div>
                 </a>
             </div>
@@ -151,20 +226,38 @@ def main():
             </button>
             <div class="header-container">
                 <h2 style="margin:0; font-size: 2em;">{{{{ currentSeries?.title || 'Loading...' }}}}</h2>
-                <p style="margin-top:10px; color:#888;">{{{{ currentSeries?.images.length }}}} badges available</p>
+                <p style="margin-top:10px; color:#888;">{{{{ currentSeries?.images.length }}}} badges available<br><span style="font-size:0.8em;">Images with a GIF tag have animated versions</span></p>
             </div>
             <div class="badge-grid" v-if="currentSeries">
-                <img v-for="img in currentSeries.images" 
-                     :key="img" 
-                     :src="'series/' + currentSeries.id + '/' + img" 
-                     loading="lazy"
-                     @load="onImgLoad"
-                     @click="selectedImg = 'series/' + currentSeries.id + '/' + img">
+                <div v-for="img in currentSeries.images" 
+                     :key="img.base" 
+                     class="badge-container img-loading-bg"
+                     @click="openModal(img)">
+                    <img :src="'series/' + currentSeries.id + '/' + img.display" 
+                         loading="lazy"
+                         @load="onImgLoad"
+                         decoding="async">
+                    <div v-if="img.has_animated" class="animated-badge">GIF</div>
+                </div>
             </div>
         </div>
 
-        <div v-if="selectedImg" class="modal" @click="selectedImg = null">
-            <img :src="selectedImg">
+        <div v-if="currentModalImg" class="modal" @click="closeModal">
+            <div class="modal-content" @click.stop>
+                <!-- Load both images using v-show to prevent lag during toggle, use decoding="async" to prevent UI freeze -->
+                <img v-show="!showAnimated" 
+                     :src="'series/' + currentSeries.id + '/' + currentModalImg.display" 
+                     decoding="async">
+                     
+                <img v-if="currentModalImg.has_animated" 
+                     v-show="showAnimated" 
+                     :src="'series/' + currentSeries.id + '/' + currentModalImg.animated" 
+                     decoding="async">
+                     
+                <button v-if="currentModalImg.has_animated" class="toggle-btn" @click="toggleAnimated">
+                    {{{{ showAnimated ? 'View Static PNG' : 'View Animated GIF' }}}}
+                </button>
+            </div>
         </div>
     </div>
 
@@ -176,7 +269,8 @@ def main():
             setup() {{
                 const search = ref('');
                 const activeId = ref('');
-                const selectedImg = ref(null);
+                const currentModalImg = ref(null);
+                const showAnimated = ref(false);
                 const lastScrollPos = ref(0);
 
                 const getHash = () => decodeURIComponent(window.location.hash.replace('#', ''));
@@ -191,19 +285,36 @@ def main():
 
                 const onImgLoad = (e) => {{
                     e.target.classList.add('loaded');
+                    // Remove loading background once image is verified loaded so transparency doesn't show skeleton underneath
+                    const parent = e.target.closest('.img-loading-bg');
+                    if (parent) {{
+                        parent.classList.remove('img-loading-bg');
+                        parent.style.background = 'transparent';
+                    }}
                 }};
 
                 const goHome = () => {{ window.location.hash = ''; }};
 
+                const openModal = (img) => {{
+                    currentModalImg.value = img;
+                    showAnimated.value = false;
+                }};
+
+                const closeModal = () => {{
+                    currentModalImg.value = null;
+                }};
+
+                const toggleAnimated = () => {{
+                    showAnimated.value = !showAnimated.value;
+                }};
+
                 const updateRoute = () => {{
                     const newId = getHash();
                     
-                    // If going from series back to home, restore scroll
                     if (activeId.value && !newId) {{
                         activeId.value = '';
                         nextTick(() => window.scrollTo(0, lastScrollPos.value));
                     }} else if (newId) {{
-                        // If going from home to series, save scroll
                         if (!activeId.value) lastScrollPos.value = window.scrollY;
                         activeId.value = newId;
                         window.scrollTo(0, 0);
@@ -217,7 +328,11 @@ def main():
                     updateRoute();
                 }});
 
-                return {{ search, activeId, filteredSeries, currentSeries, goHome, selectedImg, onImgLoad }};
+                return {{ 
+                    search, activeId, filteredSeries, currentSeries, 
+                    goHome, onImgLoad, currentModalImg, showAnimated, 
+                    openModal, closeModal, toggleAnimated 
+                }};
             }}
         }}).mount('#app');
     </script>
