@@ -36,6 +36,10 @@
   "monster": {
     "title": "Monster",
     "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19-gtMC64182sm4.jpg"
+  },
+  "precure": {
+    "title": "PRECURE",
+    "cover": "https://media.themoviedb.org/t/p/w500/uVRRvXJlP4GONB1PgbqpcaIl2Ub.jpg"
   }
 }
 
