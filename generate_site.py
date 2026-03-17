@@ -81,7 +81,6 @@ def main():
         current_series_path = os.path.join(SERIES_DIR, series)
         images = sorted([img for img in os.listdir(current_series_path) if img.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp'))])
         
-        # Group images with the same base name
         grouped_images = {}
         for img in images:
             base, ext = os.path.splitext(img)
@@ -89,7 +88,7 @@ def main():
             if base not in grouped_images:
                 grouped_images[base] = {'static': None, 'animated': None}
             
-            if ext in['.gif', '.webp']:  # Assuming gif/webp might be animated versions
+            if ext in['.gif', '.webp']:
                 grouped_images[base]['animated'] = img
             else:
                 grouped_images[base]['static'] = img
@@ -107,7 +106,6 @@ def main():
                 final_images.append({'base': base, 'display': static, 'has_animated': True, 'animated': animated})
 
         final_images.sort(key=lambda x: x['base'].lower())
-        
         series_data.append({'id': series, 'title': title, 'cover': cover_url, 'images': final_images})
 
     series_data.sort(key=lambda x: str(x['title']).lower())
@@ -126,15 +124,18 @@ def main():
         :root {{ --bg: #121212; --card-bg: #1e1e1e; --accent: #007bff; --text: #e0e0e0; }}
         body {{ font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; }}
         
-        .header-container {{ padding: 60px 20px; background-color: #1a1a1a; border-bottom: 2px solid #333; text-align: center; }}
+        .header-container {{ padding: 60px 20px 30px 20px; background-color: #1a1a1a; border-bottom: 2px solid #333; text-align: center; }}
         h1 {{ font-size: 2.8em; margin: 0 0 10px 0; letter-spacing: -1px; }}
         
+        .tabs {{ display: flex; justify-content: center; gap: 20px; margin-top: 25px; }}
+        .tab-btn {{ background: none; border: none; color: #888; font-size: 1.1em; font-weight: 600; cursor: pointer; padding: 10px 20px; transition: 0.3s; border-bottom: 3px solid transparent; }}
+        .tab-btn.active {{ color: var(--accent); border-bottom-color: var(--accent); }}
+
         #searchBar {{ width: 85%; max-width: 500px; padding: 14px 24px; margin-top: 25px; border-radius: 30px; border: 1px solid #444; background: #222; color: white; font-size: 16px; outline: none; transition: 0.3s; }}
         #searchBar:focus {{ border-color: var(--accent); box-shadow: 0 0 0 4px rgba(0,123,255,0.2); }}
 
         .grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 30px; max-width: 1300px; margin: 40px auto; padding: 0 20px; }}
         
-        /* Skeleton Loading Animation */
         .img-loading-bg {{
             background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
             background-size: 200% 100%;
@@ -145,7 +146,6 @@ def main():
             100% {{ background-position: -200% 0; }}
         }}
 
-        /* Lazy loading fade-in effect */
         img {{ opacity: 0; transition: opacity 0.6s ease-in-out; }}
         img.loaded {{ opacity: 1; }}
 
@@ -207,16 +207,43 @@ def main():
         <div v-if="!activeId">
             <div class="header-container">
                 <h1>croixph's badges</h1>
-                <input type="text" v-model="search" id="searchBar" placeholder="Search category...">
-                <h2 style="font-size: 0.8em; color: rgb(160, 160, 160); font-weight: 400;">Category names are based on the AniList ENGLISH title.<br>Exceptions include collection series (e.g. Fate, Monogatari) and anything not on AniList.<br>In that case, follow your heart.</h2>
+                
+                <div class="tabs">
+                    <button class="tab-btn" :class="{{ active: currentTab === 'categories' }}" @click="currentTab = 'categories'">Categories</button>
+                    <button class="tab-btn" :class="{{ active: currentTab === 'characters' }}" @click="currentTab = 'characters'">Characters</button>
+                </div>
+
+                <input v-if="currentTab === 'categories'" type="text" v-model="search" id="searchBar" placeholder="Search category...">
+                
+                <h2 v-if="currentTab === 'categories'" style="font-size: 0.8em; color: rgb(160, 160, 160); font-weight: 400; margin-top: 20px;">
+                    Category names are based on the AniList ENGLISH title.<br>
+                    Exceptions include collection series (e.g. Fate, Monogatari) and anything not on AniList.
+                </h2>
+                <h2 v-else style="font-size: 0.8em; color: rgb(160, 160, 160); font-weight: 400; margin-top: 20px;">
+                    Images with a GIF tag have animated versions.
+                </h2>
             </div>
-            <div class="grid">
+
+            <div v-if="currentTab === 'categories'" class="grid">
                 <a v-for="s in filteredSeries" :key="s.id" :href="'#' + encodeURIComponent(s.id)" class="card">
                     <div class="card-img-container img-loading-bg">
                         <img :src="s.cover" :alt="s.title" loading="lazy" @load="onImgLoad" decoding="async">
                     </div>
                     <div class="title">{{{{ s.title }}}}</div>
                 </a>
+            </div>
+
+            <div v-else class="badge-grid">
+                <div v-for="img in allImages" 
+                     :key="img.seriesId + img.base" 
+                     class="badge-container img-loading-bg"
+                     @click="openModal(img, img.seriesId)">
+                    <img :src="'series/' + img.seriesId + '/' + img.display" 
+                         loading="lazy"
+                         @load="onImgLoad"
+                         decoding="async">
+                    <div v-if="img.has_animated" class="animated-badge">GIF</div>
+                </div>
             </div>
         </div>
 
@@ -232,7 +259,7 @@ def main():
                 <div v-for="img in currentSeries.images" 
                      :key="img.base" 
                      class="badge-container img-loading-bg"
-                     @click="openModal(img)">
+                     @click="openModal(img, currentSeries.id)">
                     <img :src="'series/' + currentSeries.id + '/' + img.display" 
                          loading="lazy"
                          @load="onImgLoad"
@@ -244,14 +271,13 @@ def main():
 
         <div v-if="currentModalImg" class="modal" @click="closeModal">
             <div class="modal-content" @click.stop>
-                <!-- Load both images using v-show to prevent lag during toggle, use decoding="async" to prevent UI freeze -->
                 <img v-show="!showAnimated" 
-                     :src="'series/' + currentSeries.id + '/' + currentModalImg.display" 
+                     :src="'series/' + modalSeriesId + '/' + currentModalImg.display" 
                      decoding="async">
                      
                 <img v-if="currentModalImg.has_animated" 
                      v-show="showAnimated" 
-                     :src="'series/' + currentSeries.id + '/' + currentModalImg.animated" 
+                     :src="'series/' + modalSeriesId + '/' + currentModalImg.animated" 
                      decoding="async">
                      
                 <button v-if="currentModalImg.has_animated" class="toggle-btn" @click="toggleAnimated">
@@ -269,7 +295,9 @@ def main():
             setup() {{
                 const search = ref('');
                 const activeId = ref('');
+                const currentTab = ref('categories');
                 const currentModalImg = ref(null);
+                const modalSeriesId = ref('');
                 const showAnimated = ref(false);
                 const lastScrollPos = ref(0);
 
@@ -283,9 +311,18 @@ def main():
                     seriesData.find(s => s.id === activeId.value)
                 );
 
+                const allImages = computed(() => {{
+                    let flattened = [];
+                    seriesData.forEach(s => {{
+                        s.images.forEach(img => {{
+                            flattened.push({{ ...img, seriesId: s.id }});
+                        }});
+                    }});
+                    return flattened;
+                }});
+
                 const onImgLoad = (e) => {{
                     e.target.classList.add('loaded');
-                    // Remove loading background once image is verified loaded so transparency doesn't show skeleton underneath
                     const parent = e.target.closest('.img-loading-bg');
                     if (parent) {{
                         parent.classList.remove('img-loading-bg');
@@ -295,8 +332,9 @@ def main():
 
                 const goHome = () => {{ window.location.hash = ''; }};
 
-                const openModal = (img) => {{
+                const openModal = (img, sId) => {{
                     currentModalImg.value = img;
+                    modalSeriesId.value = sId;
                     showAnimated.value = false;
                 }};
 
@@ -310,7 +348,6 @@ def main():
 
                 const updateRoute = () => {{
                     const newId = getHash();
-                    
                     if (activeId.value && !newId) {{
                         activeId.value = '';
                         nextTick(() => window.scrollTo(0, lastScrollPos.value));
@@ -329,8 +366,8 @@ def main():
                 }});
 
                 return {{ 
-                    search, activeId, filteredSeries, currentSeries, 
-                    goHome, onImgLoad, currentModalImg, showAnimated, 
+                    search, activeId, currentTab, filteredSeries, currentSeries, allImages,
+                    goHome, onImgLoad, currentModalImg, modalSeriesId, showAnimated, 
                     openModal, closeModal, toggleAnimated 
                 }};
             }}
@@ -339,7 +376,7 @@ def main():
 </body>
 </html>""")
     
-    print(f"\nSuccess! Site with lazy loading and fade-in generated at {index_html_path}")
+    print(f"\nSuccess!")
 
 if __name__ == "__main__":
     main()
